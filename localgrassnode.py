@@ -10,10 +10,9 @@ from loguru import logger
 from websockets_proxy import Proxy, proxy_connect
 from fake_useragent import UserAgent
 
-user_agent = UserAgent()
-random_user_agent = user_agent.random
-
 async def connect_to_wss(socks5_proxy, user_id):
+    user_agent = UserAgent(os='windows', platforms='pc', browsers='chrome')
+    random_user_agent = user_agent.random
     device_id = str(uuid.uuid3(uuid.NAMESPACE_DNS, socks5_proxy))
     logger.info(device_id)
     while True:
@@ -21,15 +20,14 @@ async def connect_to_wss(socks5_proxy, user_id):
             await asyncio.sleep(random.randint(1, 10) / 10)
             custom_headers = {
                 "User-Agent": random_user_agent,
-                #"Origin": "chrome-extension://ilehaonighjijnmpnagapkhpcdbhclfg"
                 "Origin": "chrome-extension://lkbnfiajjmbhnfledhphioinpickokdi"
             }
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
-            #urilist = ["wss://proxy.wynd.network:4444/","wss://proxy.wynd.network:4650/"]
-            #uri = random.choice(urilist)
-            uri = "wss://proxy.wynd.network:4650"
+            urilist = ["wss://proxy.wynd.network:4444/","wss://proxy.wynd.network:4650/"]
+            uri = random.choice(urilist)
+            #uri = "wss://proxy.wynd.network:4650/"
             server_hostname = "proxy.wynd.network"
             proxy = Proxy.from_url(socks5_proxy)
             async with proxy_connect(uri, proxy=proxy, ssl=ssl_context, server_hostname=server_hostname,
@@ -59,7 +57,7 @@ async def connect_to_wss(socks5_proxy, user_id):
                                 "user_agent": custom_headers['User-Agent'],
                                 "timestamp": int(time.time()),
                                 "device_type": "extension",
-                                "version": "4.20.2",
+                                "version": "4.26.2",
                                 "extension_id": "lkbnfiajjmbhnfledhphioinpickokdi"
                             }
                         }
@@ -80,9 +78,8 @@ async def main():
     _user_id = input('Please Enter your user ID: ')
     with open('local_proxies.txt', 'r') as file:
             local_proxies = file.read().splitlines()
-    tasks = [asyncio.ensure_future(connect_to_wss(i, _user_id)) for i in local_proxies ]
+    tasks = [asyncio.ensure_future(connect_to_wss(i, _user_id)) for i in local_proxies]
     await asyncio.gather(*tasks)
-
 
 if __name__ == '__main__':
     #letsgo
