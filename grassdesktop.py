@@ -55,7 +55,7 @@ async def connect_to_wss(socks5_proxy, user_id):
                                 "user_agent": custom_headers['User-Agent'],
                                 "timestamp": int(time.time()),
                                 "device_type": "desktop",
-                                "version": "4.28.1",
+                                "version": "4.28.2",
                             }
                         }
                         logger.debug(auth_response)
